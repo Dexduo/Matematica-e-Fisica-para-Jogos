@@ -1,0 +1,238 @@
+console.log("Aperte a tecla '+' para somar vetores")
+console.log("Aperte a tecla '-' para somar vetores")
+console.log("Aperte a tecla 'i' para vetor inverso")
+console.log("Aperte a tecla 'x' para multiplicar por escalar")
+console.log("Aperte a tecla 'e' para produto escalar")
+console.log("Aperte a tecla 'v' para produto vetorial")
+console.log("Aperte a tecla 'p' para projeção")
+
+
+//NESSE TRECHO EU DECLARO 3 VETORES, DOIS PARA OPERAR E UM QUE SERÁ O RESULTANTE
+let v1 = [0, 0, 0, 0] /*x1 y1 x2 y2*/
+let v2 = [0, 0, 0, 0]
+let vresult = [0, 0, 0, 0]
+
+//ALTERN É APENAS UMA VARIAVEL CONTROLADORA, PARA INDICAR QUAL VETOR SERA DESENHADO AGORA
+let altern = 1
+//colorVec é uma controladora de cor de vetor, por exemplo ao requerir o vetor inverso o resultador será vermelho
+let colorVec = 0
+let colorEsc = 0
+
+let prodEsc = 0;
+let prodVet = 0;
+
+function mouseClicked(event){
+  colorVec = 0;
+  if(altern==3){
+    altern=1;
+  }
+  if(altern==1){
+    v1[0] = width/2;
+    v1[1] = height/2;
+    v1[2] = event.clientX;
+    v1[3] = event.clientY;
+    vresult = [0, 0, 0, 0]
+  }
+  if(altern==2){
+    v2[0] = width/2;
+    v2[1] = height/2;
+    v2[2] = event.clientX;
+    v2[3] = event.clientY;
+  }
+  altern+=1;
+  /*-----Parte de verificação de valores dos vetores-----*/
+  /*if(v1[2]<v1[0]){
+      console.log("X vetor 1: "+abs(v1[0]-v1[2])*(-1))
+    }else{
+      console.log("X vetor 1: "+abs(v1[0]-v1[2]))
+    }
+    if(v1[3]<v1[1]){
+      console.log("Y vetor 1: "+abs(v1[1]-v1[3])*(-1))
+    }else{
+      console.log("Y vetor 1: "+abs(v1[1]-v1[3]))
+    }
+    if(v2[2]<v2[0]){
+      console.log("X vetor 2: "+abs(v2[0]-v2[2])*(-1))
+    }else{
+      console.log("X vetor 2: "+abs(v2[0]-v2[2]))
+    }
+    if(v2[3]<v2[1]){
+      console.log("Y vetor 2: "+abs(v2[1]-v2[3])*(-1))
+    }else{
+      console.log("Y vetor 2: "+abs(v2[1]-v2[3]))
+    }
+  /*-----Fim de verificação de valores dos vetores-----*/
+  //console.log(altern);
+}
+
+
+
+function keyTyped(){//NESTE BLOCO ESTÁ A LÓGICA PARA AS OPERAÇÕES (MODIFICAR SE ERRADO)
+  if(key=="+"){/*SE O USUARIO APERTAR NO "+" IRÁ SOMAR OS VETORES*/
+    vresult[0] = ((v1[0]+v2[0])-width/2)
+    vresult[1] = ((v1[1]+v2[1])-height/2)
+    vresult[2] = ((v1[2]+v2[2])-width/2)
+    vresult[3] = ((v1[3]+v2[3])-height/2)
+  }
+  if(key==="-"){ /*SE O USUARIO APERTAR NO "-" IRÁ SUBTRAIR OS VETORES*/
+    vresult[0] = ((v1[0]+v2[2])-width/2)
+    vresult[1] = ((v1[1]+v2[3])-height/2)
+    vresult[2] = ((v1[2]+v2[0])-width/2)
+    vresult[3] = ((v1[3]+v2[1])-height/2)
+  }
+  if(key==="i" || key==="I"){ /*SE O USUARIO APERTAR NO "i" IRÁ MOSTRAR O VETOR INVERTIDO*/
+    let x, y = 0;
+    x = v1[0];
+    y = v1[1];
+    v1[0] = v1[2];
+    v1[1] = v1[3];
+    v1[2] = x;
+    v1[3] = y;
+    colorVec = 1;
+    altern = 1;
+  }
+  if(key==="x" || key==="X"){///*SE O USUARIO APERTAR NO "x" IRÁ MOSTRAR O VETOR X PELO ESCALAR*/
+    vresult[0] = width/2;
+    vresult[1] = height/2;
+    let escalar = prompt("Entre o valor do escalar: ")
+    escalar = parseInt(escalar)
+    //console.log(escalar);
+    if(v1[2]<width/2){
+      vresult[2] = (width/2) - (((width/2) - v1[2])*escalar)
+    }
+    if(v1[2]>=width/2){
+      vresult[2] = (width/2)+((v1[2] - (width/2))*escalar)
+    }
+    if(v1[3]<height/2){
+      vresult[3] = (height/2) - (((height/2) - v1[3])*escalar)
+    }
+    if(v1[3]>=height/2){
+      vresult[3] = (height/2)+((v1[3] - (height/2))*escalar)
+    }
+    altern = 1;
+  }
+  if(key==="e" || key==="E"){ //APERTAR "E" PARA CALCULAR PRODUTO ESCALAR
+    
+    let aux = [0, 0, 0, 0]//vetor 1: x2, y2; vetor 2: x2, y2;
+    
+    if(v1[2]<v1[0]){
+      aux[0] = abs(v1[0]-v1[2])*(-1)
+    }else{
+      aux[0] = abs(v1[0]-v1[2])
+    }
+    if(v1[3]<v1[1]){
+      aux[1] = abs(v1[1]-v1[3])*(-1)
+    }else{
+      aux[1] = abs(v1[1]-v1[3])
+    }
+    if(v2[2]<v2[0]){
+      aux[2] = abs(v2[0]-v2[2])*(-1)
+    }else{
+      aux[2] = abs(v2[0]-v2[2])
+    }
+    if(v2[3]<v2[1]){
+      aux[3] = abs(v2[1]-v2[3])*(-1)
+    }else{
+      aux[3] = abs(v2[1]-v2[3])
+    }
+    
+    prodEsc = (aux[0]*aux[2])+(aux[1]*aux[3])
+  }
+  if(key==="v" || key==="V"){ //APERTAR "V" PARA CALCULAR PRODUTO VETORIAL
+    
+    let aux = [0, 0, 0, 0]//vetor 1: x2, y2; vetor 2: x2, y2;
+    
+    if(v1[2]<v1[0]){
+      aux[0] = abs(v1[0]-v1[2])*(-1)
+    }else{
+      aux[0] = abs(v1[0]-v1[2])
+    }
+    if(v1[3]<v1[1]){
+      aux[1] = abs(v1[1]-v1[3])*(-1)
+    }else{
+      aux[1] = abs(v1[1]-v1[3])
+    }
+    if(v2[2]<v2[0]){
+      aux[2] = abs(v2[0]-v2[2])*(-1)
+    }else{
+      aux[2] = abs(v2[0]-v2[2])
+    }
+    if(v2[3]<v2[1]){
+      aux[3] = abs(v2[1]-v2[3])*(-1)
+    }else{
+      aux[3] = abs(v2[1]-v2[3])
+    }
+    
+    prodVet = (aux[0]*aux[3])-(aux[1]*aux[2])
+  }
+  if(key==="p" || key==="P"){ //APERTAR "P" PARA CALCULAR PROJEÇÃO
+    let aux = [0, 0, 0, 0]//vetor 1: x2, y2; vetor 2: x2, y2;
+    let base = 0
+    
+    if(v1[2]<v1[0]){
+      aux[0] = abs(v1[0]-v1[2])*(-1)
+    }else{
+      aux[0] = abs(v1[0]-v1[2])
+    }
+    if(v1[3]<v1[1]){
+      aux[1] = abs(v1[1]-v1[3])*(-1)
+    }else{
+      aux[1] = abs(v1[1]-v1[3])
+    }
+    if(v2[2]<v2[0]){
+      aux[2] = abs(v2[0]-v2[2])*(-1)
+    }else{
+      aux[2] = abs(v2[0]-v2[2])
+    }
+    if(v2[3]<v2[1]){
+      aux[3] = abs(v2[1]-v2[3])*(-1)
+    }else{
+      aux[3] = abs(v2[1]-v2[3])
+    }
+    
+    base = ((aux[0]*aux[2])+(aux[1]*aux[3]))/((aux[1]*aux[1])+(aux[3]*aux[3]))
+    
+    vresult[0] = v1[0] //COMO A ORIGEM É A MESMA MELHOR EVITAR RECALCULAR O PONTO CENTRAL DA TELA
+    vresult[1] = v1[0]
+    vresult[2] = parseInt((base*aux[2])+v1[0])
+    vresult[3] = parseInt((base*aux[3])+v1[1])
+    //console.log(vresult)
+  }
+  //console.log(key);
+}
+
+
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(220);
+  /*showVec();
+  showVec();*/
+  strokeWeight(0)
+  textSize(14)
+  text("Produto Escalar: "+prodEsc, 10, 20);
+  text("Produto Vetorial: "+prodVet, 10, 40);
+  
+  strokeWeight(1);
+  
+  if(colorVec==1){
+    stroke(255, 0, 0);
+    line(v1[0], v1[1], v1[2], v1[3]);
+    stroke(255, 0, 0);
+    circle(v1[2], v1[3], 5);
+  }else{
+    stroke(0, 0, 0);
+    line(v1[0], v1[1], v1[2], v1[3]);
+    stroke(0, 0, 0);
+    circle(v1[2], v1[3], 5);
+  }
+  line(v2[0], v2[1], v2[2], v2[3]);
+  circle(v2[2], v2[3], 5);
+  stroke(255, 0, 0);
+  line(vresult[0], vresult[1], vresult[2], vresult[3]);
+  stroke(255, 0, 0);
+  circle(vresult[2], vresult[3], 5)
+}
