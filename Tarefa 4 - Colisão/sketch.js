@@ -55,6 +55,8 @@ function draw() {
   
   if(colision == true){
     texto("Colisão Existe", 0, 0);
+  } else{
+    texto("Colisão Não Existe", 0, 0);
   }
   
   /*texto("A", vectorAB.x1+5, vectorAB.y1+5)
