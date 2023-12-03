@@ -1,0 +1,319 @@
+console.log("Aperte a tecla 'A' para desenha uma AABB")
+console.log("Aperte a tecla 'C' para desenha um Círculo")
+
+let altern = []
+let mouse
+let objects = []
+
+function keyTyped(){//NESTE BLOCO ESTÁ A LÓGICA PARA AS OPERAÇÕES (MODIFICAR SE ERRADO)
+  if(altern.length == 2){
+    altern = []
+    objects = []
+    
+  }
+  if(key=="A" || key=='a'){
+    //console.log("Desenhando AABB")
+    inAABB = false
+    altern.push('a')
+    cloud2 = new Cloud()
+    obj2 = new AABB(cloud2)
+    objects.push(obj2)
+    pertenceVolume(pontoClicado)
+    
+  }
+  if(key=="C" || key=='c'){
+    //console.log("Desenhando Círculo")
+    inCircle = false
+    altern.push('c')
+    cloud1 = new Cloud()
+    obj1 = new Circle(cloud1)
+    objects.push(obj1)
+    pertenceVolume(pontoClicado)
+  }
+  temColisao()
+}
+
+function temColisao(){
+  let objs = []
+  
+  colisao = false
+  
+  if(objects.length == 2){
+    
+    for(let i=0; i<2; i++){
+      if(objects[i].name == 'circle'){
+        objs.push({centro: objects[i].centro, lado: objects[i].raio, altura: objects[i].raio})
+      }
+      
+      if(objects[i].name == 'aabb'){
+        objs.push({centro: objects[i].centro, lado: objects[i].lado/2, altura: objects[i].altura/2})
+      }
+    }
+    
+    if(
+      ((dist(objs[0].centro[0], objs[0].centro[1], objs[1].centro[0], objs[1].centro[1])) < (objs[0].lado + objs[1].lado))
+      ||
+      ((dist(objs[0].centro[0], objs[0].centro[1], objs[1].centro[0], objs[1].centro[1])) < (objs[0].altura + objs[1].altura))
+      ) {
+      
+      colisao = true
+      
+    }
+    
+  }
+}
+
+function mouseClicked(){
+  pontoClicado[0] = mouseX
+  pontoClicado[1] = mouseY
+  pertenceVolume(pontoClicado)
+}
+
+function pertenceVolume(ponto){
+  /*inCircle = false
+  inAABB = false*/
+  for(let i=0; i<objects.length; i++){
+    objects[i].inside = false
+    
+    if(objects[i].name == 'circle'){
+      let distancia = parseInt(dist(objects[i].centro[0], objects[i].centro[1], ponto[0], ponto[1]))
+      if(distancia < objects[i].raio){
+        /*console.log(distancia)
+        console.log(objects[i].raio)
+        console.log("Entrou")*/
+        objects[i].inside = true
+      }
+    }
+    if(objects[i].name == 'aabb'){
+      let dentro = (objects[i].MenorXY[0] <= ponto[0]) && (objects[i].MaiorXY[0] > ponto[0]) && (objects[i].MenorXY[1] <= ponto[1]) && (objects[i].MaiorXY[1] > ponto[1])
+          
+      if(dentro){
+        //console.log()
+        //console.log("Entrou")
+        objects[i].inside = true
+      }
+    }
+    
+  }
+}
+
+let pontoClicado = [0, 0]
+let cloud1
+let cloud2
+let obj1
+let obj2
+let inCircle = false
+let inAABB = false
+let colisao = false
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(220);
+  
+  textSize(14)
+  fill('green')
+  text("Aperte a tecla 'A' para desenha uma AABB", 10, 10)
+  text("Aperte a tecla 'C' para desenha um Círculo", 10, 25)
+  text("Você pode clicar um ponto na tela", 10, 40)
+  
+  if(colisao){
+    fill('red')
+    textSize(20)
+    text("TEM COLISÃO", 10, 60)
+  }
+  fill('green')
+  textSize(12)
+  for(let i=0; i<objects.length; i++){
+    if(objects[i].inside == true){
+      text("Ponto está no objeto", objects[i].centro[0], objects[i].centro[1])
+    }
+  }
+  for(let i=0; i<objects.length; i++){
+    objects[i].drawObj()
+  }
+
+  if(pontoClicado.length != 0){
+    fill('rgb(72, 229, 34 )')
+    circle(pontoClicado[0], pontoClicado[1], 5)
+  }
+}
+
+
+
+
+
+
+
+//INÍCIO DA CLASSE NUVEM DE PONTOS =================================
+class Cloud{
+  constructor(){
+    this.points = []
+    this.numberPoints = 5
+    this.cloudPoints()
+  }
+  
+  cloudPoints(){
+    //A variável quadrante é útil para criar um escopo uma localização "específica" no canvas para cada vez que uma nuvem de pontos for criada, ou seja, vou criar o X e o Y dos pontos da nuvem de pontos de acordo com a região especificada por quadranteX e quadranteY
+    let x = 0
+    let y = 0
+    let quadranteX = parseInt(random(0, width-150))
+    let quadranteY = parseInt(random(0, height-150))
+    for(let i = 0; i<this.numberPoints; i++){
+      x = parseInt(random(quadranteX, quadranteX+150))
+      y = parseInt(random(quadranteY, quadranteY+150))
+      this.points.push([x, y])
+    }
+  }
+  
+  drawCloud(colore){
+    for(let i = 0; i<this.numberPoints; i++){
+      fill(colore)
+      circle(this.points[i][0], this.points[i][1], 5)
+    }
+  }
+}
+//FIM DA CLASSE NUVEM DE PONTOS =================================
+
+//FIM DA CLASSE CIRCULO =================================
+class Circle{
+  constructor(cloud){
+    this.cloud = cloud
+    this.points = cloud.points
+    this.numberPoints = cloud.numberPoints
+    this.name = "circle"
+    this.MaiorXY = [-Infinity, -Infinity]
+    this.MenorXY = [Infinity, Infinity]
+    this.centro = [0, 0]
+    this.maisDistante = [0, 0]
+    this.raio = 0
+    this.calcularCentro()
+    this.inside = false
+  }
+  
+  calcularCentro(){
+    for(let i=0; i<this.numberPoints; i++){
+        if(this.points[i][0] > this.MaiorXY[0]){
+          this.MaiorXY[0] = this.points[i][0]
+        }
+        if(this.points[i][1] > this.MaiorXY[1]){
+          this.MaiorXY[1] = this.points[i][1]
+        }
+        if(this.points[i][0] < this.MenorXY[0]){
+          this.MenorXY[0] = this.points[i][0]
+        }
+        if(this.points[i][1] < this.MenorXY[1]){
+          this.MenorXY[1] = this.points[i][1]
+        }
+    }
+    
+    this.centro[0] = parseInt((this.MaiorXY[0]-this.MenorXY[0])/2)+this.MenorXY[0]
+    this.centro[1] = parseInt((this.MaiorXY[1]-this.MenorXY[1])/2)+this.MenorXY[1]
+    
+    if(Math.abs(this.MaiorXY[0]-this.centro[0]) > Math.abs(this.MenorXY[0]-this.centro[0])){
+      this.maisDistante[0] = this.MaiorXY[0]
+    } else{
+      this.maisDistante[0] = this.MenorXY[0]
+    }
+  
+    if(Math.abs(this.MaiorXY[1]-this.centro[1]) > Math.abs(this.MenorXY[1]-this.centro[1])){
+      this.maisDistante[1] = this.MaiorXY[1]
+    } else{
+      this.maisDistante[1] = this.MenorXY[1]
+    }
+    
+    //console.log(this.maisDistante[0])
+    //console.log(this.maisDistante[1])
+    //console.log(this.centro[0])
+    //console.log(this.centro[1])
+    
+    this.raio = parseInt(dist(this.centro[0], this.centro[1], this.maisDistante[0], this.maisDistante[1]));
+    //console.log(this.raio)
+  }
+  
+  drawObj(){
+    this.cloud.drawCloud('white')
+    fill('red')
+    circle(this.maisDistante[0], this.maisDistante[1], 5)
+    
+    fill('black')
+    circle(this.centro[0], this.centro[1], 5)
+    fill('rgba(0,255,0, 0)')
+    circle(this.centro[0], this.centro[1], 2*this.raio) //3 parametro é o raio
+  }
+  
+}
+//FIM DA CLASSE CIRCULO =================================
+
+//INICIO DA CLASSE QUADRADO =================================
+class AABB{
+  constructor(cloud){
+    this.cloud = cloud
+    this.points = cloud.points
+    this.numberPoints = cloud.numberPoints
+    this.name = "aabb"
+    this.MaiorXY = [-Infinity, -Infinity]
+    this.MenorXY = [Infinity, Infinity]
+    this.centro = [0, 0]
+    this.maisDistante = [0, 0]
+    this.lado = 0
+    this.altura = 0
+    this.calcularCentro()
+    this.inside = false
+  }
+  
+  calcularCentro(){
+    for(let i=0; i<this.numberPoints; i++){
+        if(this.points[i][0] > this.MaiorXY[0]){
+          this.MaiorXY[0] = this.points[i][0]
+        }
+        if(this.points[i][1] > this.MaiorXY[1]){
+          this.MaiorXY[1] = this.points[i][1]
+        }
+        if(this.points[i][0] < this.MenorXY[0]){
+          this.MenorXY[0] = this.points[i][0]
+        }
+        if(this.points[i][1] < this.MenorXY[1]){
+          this.MenorXY[1] = this.points[i][1]
+        }
+    }
+    
+    this.centro[0] = parseInt((this.MaiorXY[0]-this.MenorXY[0])/2)+this.MenorXY[0]
+    this.centro[1] = parseInt((this.MaiorXY[1]-this.MenorXY[1])/2)+this.MenorXY[1]
+    
+    if(Math.abs(this.MaiorXY[0]-this.centro[0]) > Math.abs(this.MenorXY[0]-this.centro[0])){
+      this.maisDistante[0] = this.MaiorXY[0]
+    } else{
+      this.maisDistante[0] = this.MenorXY[0]
+    }
+  
+    if(Math.abs(this.MaiorXY[1]-this.centro[1]) > Math.abs(this.MenorXY[1]-this.centro[1])){
+      this.maisDistante[1] = this.MaiorXY[1]
+    } else{
+      this.maisDistante[1] = this.MenorXY[1]
+    }  
+    //console.log(this.maisDistante[0])
+    //console.log(this.maisDistante[1])
+    //console.log(this.centro[0])
+    //console.log(this.centro[1])
+  
+    this.lado = this.MaiorXY[0] - this.MenorXY[0]
+    this.altura = this.MaiorXY[1] - this.MenorXY[1]  
+  }
+  
+  
+  drawObj(){
+    this.cloud.drawCloud('orange')
+    fill('red')
+    circle(this.maisDistante[0], this.maisDistante[1], 5)
+    
+    fill('black')
+    circle(this.centro[0], this.centro[1], 5)
+    fill('rgba(0,255,0, 0)')
+    rect(this.MenorXY[0], this.MenorXY[1], this.lado, this.altura) //3 parametro é o raio
+  }
+  
+}
+//FIM DA CLASSE QUADRADO =================================
